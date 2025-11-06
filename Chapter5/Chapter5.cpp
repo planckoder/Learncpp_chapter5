@@ -187,7 +187,9 @@ int main()
 *		- static_assert
 * 
 *	A constant expression is non-empty sequence of literals, constant variables, operators and function calls, that are executed 
-*	during the compile-time. They form the backbone of the compile-time evaluation in C++. It can be a literal (4), an operator with
+*	during the compile-time. They form the backbone of the compile-time evaluation in C++. It can be a literal (4), an operator with 
+*	constant expression operands (2+7), const integral variables whith a constant expression initializer (int x{6}; ) (but constexpr
+*	is preffered) , constexpr variables and finally constexpr function calls with constant expression arguments.
 **************************************** 5.6 - Constexpr variables *******************************************************************
 *	Now let's create our own constant variables! The first way to do it is to use the keyword "const". This "const" variable, with an
 *	integral type and an constant expression initializer can be used in a constant expression. But there are some challenges with it:
@@ -198,8 +200,8 @@ int main()
 	int b{};
 	const int variableB{ b };			// Not a constant expression since the initializer is non-const
 	const int variableC{ 5 };			// It's a constant expression
-	const int variableD{ someVar };		// We can be sure whether variableD is usable in a constant expression or not
-	const int variableE{ function() };	// the same notice as above
+	//const int variableD{ someVar };		// We can be sure whether variableD is usable in a constant expression or not
+	//const int variableE{ function() };	// the same notice as above
 
 /*		- Secondly, const doesn't inform the compiler that we require a variable usable in a constant expression. Instead, it silently
 *		  creates a variable that can only be used in runtime expression.
