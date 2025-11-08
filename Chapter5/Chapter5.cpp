@@ -11,6 +11,20 @@ void print_five(const short x)
 	std::cout << x << '\n';
 }
 
+int user_val()
+{
+	int y;
+	std::cout << "Enter an integer value : " << '\n';
+	std::cin >> y;											// can only executes at runtime
+	return y;												// Not a constant expression => runtime expression
+}
+
+int three()
+{
+	constexpr int x{ 3 };
+	return x;												// this return is a constant expression, but the substitution won't be
+}
+
 int main()
 {
 /************************************** 5.1 — Constant variables (named constants) ***************************************************
@@ -189,8 +203,52 @@ int main()
 *	A constant expression is non-empty sequence of literals, constant variables, operators and function calls, that are executed 
 *	during the compile-time. They form the backbone of the compile-time evaluation in C++. It can be a literal (4), an operator with 
 *	constant expression operands (2+7), const integral variables whith a constant expression initializer (int x{6}; ) (but constexpr
-*	is preffered) , constexpr variables and finally constexpr function calls with constant expression arguments.
-**************************************** 5.6 - Constexpr variables *******************************************************************
+*	is preffered) , constexpr variables and finally constexpr function calls with constant expression arguments. Some examples :
+*/
+	// Literals can be used in constant expression
+	6;								// constant expression
+	6.54;							// constant expression
+	"word";							// constant expression
+	
+	// Most operators that have constant operands can be used in constant expression
+	8 * 5.6;
+	1 + 6;
+	sizeof(int) - 2;				// sizeof(int) can be determined at the compile time
+
+	// The return values of non-constexpr functions can only be used in runtime
+	user_val();						// runtime expression
+	three();						// runtime expression, even though the return expression is a constant expression
+
+	// Operators whitout constant expression operands can only be used in runtime
+	std::cout << 7;					// can only executes in runtime
+
+	// Const integral variables with a constant expression initializer can be used in constant expressions
+	const int a{ 7 };				// constant expression
+	const int b{ a };				// constant expression, because the initializer is also a constant expression
+	const long c{ b - 5 };				// operator - use constant operands, so it's a constant expression
+
+	// Other variables can't be use in constant expressions, even if they have a constant expression initializer
+	int d{ 9 };						// Not const
+	const int e{ d };				// hasn't a constant expression initializer
+	const double f{ 9.56 };			// not an integer => can't be used in constant expression
+
+/*	You may think that constant expressions are always evaluated at compile time, but counterintuitively, it's not the case. In fact, 
+*	"the compiler is only required (tenu) to evaluate a constant expresssion at compile-time in context that require a constant
+*	expression.". That means, it will evaluate a constant expression only if it's necessary, otherwise, it could choose to evaluate it
+*	or not. Examples :
+*/
+	int g{ 3 + 4 };					// g is not a constant expression (not a const), so evaluating the constant expression "3+4" is 
+									// necessary in this context. The compiler may choose to evaluate it or not at compile time.
+	const double long h{ 3 + 4 };	// In this case, if we don't evaluate the constant expression "3+4", the compiler won't be able to
+									// initialize the constant variable h, so here the compiler MUST evaluate 3+4
+/*	However, modern compilers will usually evaluate constant expressions, even if they aren't required, when optimizations are enabled.
+*	There are two main reasons for this behaviour :
+*		- It's easier to debug when we have less compile-time evaluations (imagine if the compiler did a wrong calculation).
+*		- It gives more flexibility to the compiler to optimize as it sees fit (comme bon lui semble).
+* 
+* 
+*/
+/*************************************** 5.6 - Constexpr variables *******************************************************************
 *	Now let's create our own constant variables! The first way to do it is to use the keyword "const". This "const" variable, with an
 *	integral type and an constant expression initializer can be used in a constant expression. But there are some challenges with it:
 *		- Firstly, it's not immediatly clear whether the variable is usable in a constant expression or not. So it means we have to go
