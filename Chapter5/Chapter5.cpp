@@ -25,6 +25,22 @@ int three()
 	return x;												// this return is a constant expression, but the substitution won't be
 }
 
+int min(int x, int y)
+{
+	if (x < y)
+		return x;
+	else
+		return y;
+}
+
+constexpr Cmin(int x, int y)
+{
+	if (x < y)
+		return x;
+	else
+		return y;
+}
+
 int main()
 {
 /************************************** 5.1 — Constant variables (named constants) ***************************************************
@@ -223,8 +239,8 @@ int main()
 	std::cout << 7;					// can only executes in runtime
 
 	// Const integral variables with a constant expression initializer can be used in constant expressions
-	const int a{ 7 };				// constant expression
-	const int b{ a };				// constant expression, because the initializer is also a constant expression
+	const int aa{ 7 };				// constant expression
+	const int b{ aa };				// constant expression, because the initializer is also a constant expression
 	const long c{ b - 5 };				// operator - use constant operands, so it's a constant expression
 
 	// Other variables can't be use in constant expressions, even if they have a constant expression initializer
@@ -257,13 +273,13 @@ int main()
 */
 /*************************************** 5.6 - Constexpr variables *******************************************************************
 *	Now let's create our own constant variables! The first way to do it is to use the keyword "const". This "const" variable, with an
-*	integral type and an constant expression initializer can be used in a constant expression. But there are some challenges with it:
+*	integral type and a constant expression initializer can be used in a constant expression. But there are some challenges with it:
 *		- Firstly, it's not immediatly clear whether the variable is usable in a constant expression or not. So it means we have to go
 *		  inspect the definitions of those initializer and infer (déduire) what case we're in.
 */
 	int variableA{ 5 };		// Obviously not a constant expression
-	int b{};
-	const int variableB{ b };			// Not a constant expression since the initializer is non-const
+	int bb{};
+	const int variableB{ bb };			// Not a constant expression since the initializer is non-const
 	const int variableC{ 5 };			// It's a constant expression
 	//const int variableD{ someVar };		// We can be sure whether variableD is usable in a constant expression or not
 	//const int variableE{ function() };	// the same notice as above
@@ -271,6 +287,60 @@ int main()
 /*		- Secondly, const doesn't inform the compiler that we require a variable usable in a constant expression. Instead, it silently
 *		  creates a variable that can only be used in runtime expression.
 *		- And finally, the "const" keyword does not extend to non integral variables.
+* 
+*	Fortunatly, we can use the keyword "constexpr" to ensure we get a compile-time constant variable. A constexpr variable is always a
+*	compile-time constant, which means it must be initialized with a constant expression, otherwise it will occur an error. Examples:
+*/
+	constexpr double sum{ 5 + 2.5 };	// OK, because 5+2.5 is a constant. And as you can see, we can use non-integral values
+	constexpr double sum2{ sum };		// OK, because sum is a constant expression
+	int age{};
+	std::cout << "enter your age : " << '\n';
+	std::cin >> age;
+	//constexpr int user_age{age};		// This will result an error (C2373), because "age" can't be determined at the compile-time
+	//constexpr int num_test{three};	// The return of this function is not a constant expression
+
+/*	Now, let's see the difference between const and constexpr variables :
+*		- Const :
+*			Means that the value of the variable can't be changed after the initialization. The initializer can be constant or not. 
+*			The const object can be evaluated at the runtime.
+*		- Constexpr :
+*			Means that the object can be used in a constant expression. The value of the initializer must be known at the 
+*			compile-time. The constexpr object can be evaluated at runtime or compile-time. So constexpr variables are implicitly 
+*			const.
+*	The best practices of using these constant types is :
+*		- Variables whose initializer ia a constant expression should be declared as constexpr.
+*		- Variables whose initializer is not a constant expression should be declared as const.
+* 
+*	What about const and constexpr function parameters? They are initialized in a function at runtime, which leads to 2 consequences:
+*		- const function parameters are treated as runtime constants
+*		- Function parameters cannot be declared as constexpr, since their initialization value isn't determined until runtime.
+* 
+*	Until now we used some specific words as compile-time expressions, or constants. But let's clearly define them:
+*		- Compile-time constant:
+*			A value or a non-modifiable object whose value must be known at compile-time. (e.g. literals or constexpr variables)
+*		- Constexpr:
+*			Keyword that declares objects as compile-time constants.
+*		- Constant expression:
+*			An expression that contains compile-time constants or operators/functions that support compile-time evaluation.
+*		- Runtime expression:
+*			Not a constant expression. (expressions evaluated at runtime)
+*		- Runtime constants:
+*			A value or non-modifiable object that is not a compile-time constant.
+* 
+*	A constexpr function is a function that can be called in a constant expression. If it's called in the intialization of a constexpr
+*	variable, it MUST be evaluated at compile-time. Otherwize, it may be evaluated at either compile-time (only if all the arguments 
+	are constant expressions) or runtime.
+*/
+	int m1{ min(5, 6) };			// OK
+	const int m2{ min(5, 6) };		// OK
+	//constexpr int m3{min(5, 6)};	// ERROR: min(5, 6) is not a constant expression
+
+	int m4{min(5, 6)};				// OK: may evaluate at runtime or compile-time
+	const int m5{min(5, 6)};		// OK: may evaluate at runtime or compile-time
+	constexpr int m6{min(5, 6)};	// OK: MUST evaluate at compile-time
+	
+
+/*************************************** 5.7 - Introduction to std::string ***********************************************************
 */
 
 	return 0; 
