@@ -246,7 +246,14 @@ int main()
 *		- It's easier to debug when we have less compile-time evaluations (imagine if the compiler did a wrong calculation).
 *		- It gives more flexibility to the compiler to optimize as it sees fit (comme bon lui semble).
 * 
-* 
+*	But you may wondering, why compile time expressions must be constant? Look at this example: 
+*/
+	int i{ 5 };						// At this point the value of "i" is known, so there isn't any problem
+	std::cin >> i;					// But now, "i" can't be evaluated at compile-time
+/*	Thus, a single line of code which can't be evaluated at compile-time will violate the requirement that such an expression must 
+*	always be capable of being evaluated at compile. If the compiler had to know when a variable can be evaluated at compile-time, and
+*	when not, it would have added a lot of complexity to the compiler. For these reasons, only constant objects can be evaluated at 
+*	compile-time.
 */
 /*************************************** 5.6 - Constexpr variables *******************************************************************
 *	Now let's create our own constant variables! The first way to do it is to use the keyword "const". This "const" variable, with an
