@@ -3,6 +3,7 @@
 #include <print>	// for std::println()
 #include <bitset>
 #include <iostream>
+#include <string>
 
 
 // The function uses a constant argument, so we ensure the variable won't be changed.
@@ -33,7 +34,7 @@ int min(int x, int y)
 		return y;
 }
 
-constexpr Cmin(int x, int y)
+constexpr int cmin(int x, int y)
 {
 	if (x < y)
 		return x;
@@ -335,12 +336,50 @@ int main()
 	const int m2{ min(5, 6) };		// OK
 	//constexpr int m3{min(5, 6)};	// ERROR: min(5, 6) is not a constant expression
 
-	int m4{min(5, 6)};				// OK: may evaluate at runtime or compile-time
-	const int m5{min(5, 6)};		// OK: may evaluate at runtime or compile-time
-	constexpr int m6{min(5, 6)};	// OK: MUST evaluate at compile-time
+	int m4{cmin(5, 6)};				// OK: may evaluate at runtime or compile-time
+	const int m5{cmin(5, 6)};		// OK: may evaluate at runtime or compile-time
+	constexpr int m6{cmin(5, 6)};	// OK: MUST evaluate at compile-time
 	
 
 /*************************************** 5.7 - Introduction to std::string ***********************************************************
+*	This is a C-style string :
+*/
+	std::cout << "Hello world!" << '\n';
+/*	They're fine to use, but in some cases they behave quite oddly (assez étrangement), and are best avoided (sont à éviter):
+*		- It's hard to work with because with can assign to this string a new value.
+*		- It can be dangerous because if we copy a large C-style string into the space allocated for a smaller C-style sting, 
+*		  unedefined behaviour will result.
+*	Fortunately, C++ has introduced new types for strings: std::string and std::string_view. In fact they're not really a fundamental
+*	type, but instead a class type (we'll cover it later).
+* 
+*	To use "std::string", me must add at the top of the file it's header: #define <sting>. To create an object, we can simply use 
+*	"std::string" keyword to initialize an object of this type. We can do assignements with it, and even print the object using
+*	std::cout. However, numbers in a string are treated as text, so we can't do mathematical manipulations. 
+*	And the neatest thing (la chose la plus chouette) about std::string, is that it can handle the lenght of a sting by itself!
+*	This is what make this type very powerful! By this way you can write verrrryyyyy long strings, and even if you haven't enough
+*	memory, you can use the dynamic memory allocation, to allocate more memory (covered later).
+*/
+	std::string surname{"Ragin"};			// We can initialize a sting using "std::string"
+	surname = "Rhimi";						// We can assign another string to the object
+	std::cout << "My surname is : " << surname << '\n';		// We can print this string
+	std::string ID{ "45" };					// Numbers are treated as text
+	std::string nothing{};
+	std::cout << "[" << nothing << "]" << '\n';				// If we have nothing in the string, it will print nothing
+	std::string text{ "short" };			// This is a short text. It contains 6 characters (whose one is a null-terminator)
+	text = "And this is long";				// And here's 17! We changed the lengh of our string!
+	std::cout << text << '\n';
+
+//	However, std::cin may yield (peut donner) some problems! Consider the folowing examples:
+	std::cout << "Your name: ";
+	std::string name{};
+	std::cin >> name;
+	std::cout << "Your favorite color: ";
+	std::string color{};
+	std::cin >> color;
+	std::cout << '\n' << "Name: " << name << " Color: " << color << '\n';
+/*	If you wrote you surname, and then your first name, you will discover that you first name was assigned to the string "color"!
+*	And that's normal: std::cin, with operator >>, only returns characters up to the first whitespace it encounters. Any other
+*	characters are left inside std::cin, waiting for the next extraction (in our case, std::cin for the color).
 */
 
 	return 0; 
