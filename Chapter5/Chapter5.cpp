@@ -380,6 +380,57 @@ int main()
 /*	If you wrote you surname, and then your first name, you will discover that you first name was assigned to the string "color"!
 *	And that's normal: std::cin, with operator >>, only returns characters up to the first whitespace it encounters. Any other
 *	characters are left inside std::cin, waiting for the next extraction (in our case, std::cin for the color).
+*	If we want to enter all the line, we should use the function std::getline() instead. This function is already included in the 
+*	header <sting>, and it takes two arguments: the first is std::cin, and the second your string.
+*/
+	std::cout << "Your name: ";
+	std::string nameB{};
+	std::getline(std::cin >> std::ws, nameB);			// The function getline, with the manipulator std::ws
+
+	std::cout << "Your favorite color: ";
+	std::string colorB{};
+	std::getline(std::cin >> std::ws, colorB);
+
+	std::cout << "Your name is: " << nameB << "	and your favorite color is: " << colorB << "\n";
+/*	Now, all is working! But there's one thing we must explain, and that's the manipulator "std::ws". In order to better understand
+*	it, consider the following example: 
+*/
+	std::cout << "Tell me your house nummber: ";
+	short int house_num{};
+	std::cin >> house_num;
+
+	std::cout << "Tell me your street: ";
+	std::string street{};
+	std::getline(std::cin, street);						// note: there isn't the manipulator std::ws
+
+	std::cout << "Your adress is: " << house_num << ", " << street << '\n';
+
+/*	Now, you'll see that the string street hasn't been asked, and hasn't been printed. That's because the previous std::cin captured
+*	the character '\n', the character newline (when you pressed enter). So when we enter 34 for example, std::cin will see '34\n'
+*	instead. It will extract 34, leaving the newline character behind for later. When the function "getline" want to extract a 
+*	string, it sees that there's already the newline character '\n' waiting in std::cin. So according to him we already entered an
+*	empty string.
+*	The extraction operator >> ignores leading whitespaces (espaces blancs au début), such as the newline character, but the
+*	"std::getline()" function well. So to bypass this problem, we use the manipulator std::ws, which helps us to ignore the 
+*	leading whitespaces.
+*	The best practice is to already use std::ws manipulator in the function std::getline(). You must put it for each function, 
+*	because it's not preserved accros calls.
+* 
+*	If you want to know the lengh of your string, you can use the function length(). This function returns the number of characters
+*	without the implicit null-terminator. The returned type is an unsigned integer, so if you want to assign this value to an int, 
+*	you must use the "static_cast" to convert the type.
+*	But what's more interesting, the synthaxe for this function is slightly different. Until now we've seen this :
+*	function(object). But the "length()" function is a member function. That means it's declared inside of std::string, and the
+*	argument is sent by this way: object.function(). We'll talk more about these functions later.
+*/
+	std::string book{ "Dune" };
+	size_t length{ book.length() };
+	std::cout << "In Dune there are " << length << " characters." << '\n';
+	//int size{ length };							// lenght is an unsigned integer, I can't assign it to an integer
+	int size{ static_cast<int>(length) };			// but we can change the type by using static_cast
+	std::cout << -size * 2 << '\n';					// it's working! We have a signed integer!
+
+/*	
 */
 
 	return 0; 
