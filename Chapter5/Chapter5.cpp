@@ -5,6 +5,9 @@
 #include <iostream>
 #include <string>
 
+#define skip
+
+std::string already_here{ "I'll be copied" };	// This string is out of scope of main, so I can return it in "case4()"
 
 // The function uses a constant argument, so we ensure the variable won't be changed.
 void print_five(const short x)
@@ -42,8 +45,16 @@ constexpr int cmin(int x, int y)
 		return y;
 }
 
+void print_text(std::string s);
+
+std::string case1();
+std::string case2();
+std::string case3();
+std::string case4();
+
 int main()
 {
+#ifndef skip
 /************************************** 5.1 — Constant variables (named constants) ***************************************************
 *	A constant is a value that may not be changed during the program's execution. There are two types : named and litteral constants.
 *	A named constant is a value wich is associated with an identifier, and a litteral is not.
@@ -429,9 +440,63 @@ int main()
 	//int size{ length };							// lenght is an unsigned integer, I can't assign it to an integer
 	int size{ static_cast<int>(length) };			// but we can change the type by using static_cast
 	std::cout << -size * 2 << '\n';					// it's working! We have a signed integer!
+#endif
+/*	But although std::string has may advantages, it has one major drawback: it is expensive. Every time you initialize a string, it
+*	copies each character form the C-style string into its own memory, which can be expansive in time. Moreover, when a std::string
+*	is passed to a function by value (so as an argument), it must copy the string to the function.
+*	So the best practice is to avoid to pass a string to a function by value (we'll see how in the next chapter).
+*/
+	std::string long_txt{ "This is a very long string" };	// Expensive, because it must copy each character and allocate memory
+	std::string word{ "My text" };
+	print_text(word);							// that's a very bad practice, because we must copy the string into the function
+												// so finally, to strings coexist, and that's could be very expansive in memory
+
+/*	You may expect that for returning a string, using std::string, by value to the caller, it will be also expensive, however it's not
+*	the case. You can return an std::string in these 3 cases:
+*		- If you return a local string from the function
+*		- If you return a std::string, that has been returned previously by another function
+*		- If it's a tempory string created as a part of the return statement
+*	However, if you return a string that already exists, that can be slow since now we get two strings.
+*/
+	case1();			// Okay, it doesn't copy the local string into the caller, because it construct the string directly in
+						// the caller's return slot. (in other words, case1(); is transformed into the string that has been returned)
+	case2();			// Okay, for the same reason
+	case3();			// Okay, for the same reason
+	case4();			// BAD: the returned string already exists => it's the string "already_here". So we have a copy of this string
 
 /*	
 */
-
 	return 0; 
-} 
+}
+
+// This function print a text. BAD PRACTICE, NEVER PASS AN STD::STRING IN A FUNCTION BY VALUE !!!
+void print_text(std::string s)
+{
+	std::cout << s << '\n';
+}
+
+// returns the local string
+std::string case1()
+{
+	std::string s{ "Hello" };	// You may think that at this point we create a string. But not, it is created at the function caller!
+								// So we don't have 2 copies of the same string, the memory for it was allocated only one time.
+	return s;
+}
+
+// a function that returns a string as a part of the return statement
+std::string case3()
+{
+	return "Mama mia!";
+}
+
+// Returns a string that had been return be another function
+std::string case2()
+{
+	return case3();
+}
+
+// Returns a string that already exists in main()
+std::string case4()
+{
+	return already_here;
+}
