@@ -4,6 +4,7 @@
 #include <bitset>
 #include <iostream>
 #include <string>
+#include <string_view>
 
 #define skip
 
@@ -52,6 +53,7 @@ std::string case2();
 std::string case3();
 std::string case4();
 
+void printSV(std::string_view s);
 int main()
 {
 #ifndef skip
@@ -476,9 +478,23 @@ int main()
 *	Also it's possible to create constexpr std::string strings, but they are badly supported in the latests C++ versions, so use 
 *	std::string_view instead.
 * 
-* 
+**************************************** 5.8 - Introduction to std::string ***********************************************************
+*	Consider the following examples:
 */
-
+	int alpha{ 8 };			// the value 8 is copied into the memory allocated for variable alpha. For fundamental types it's fast
+	std::string hello{ "hello world!" };	// But for strings it far more slower! It must copy each character into the memory
+	print_text(hello);						// and this is even worse! we copy the string 2 times: 1 time is the initalizer, and the
+											// second time in the function
+/*	So using always std::string type may be unefficient. That's why we introduce another type: std::string_view
+* 
+*	To adress this issue, we should use "std::string_view", which lives in the header <string_view>. But std::string_view is a new 
+*	feature, that was implemented in C++17. So if you have another version of C++(It was my case, my version was C++14), rigth click 
+*	on your program in the solution explorer (normally in the window at the right of your screen. Don't choose the program.cpp file,
+*	but the file wich is situated at the top), choose "properties", and in the window that appears, click on the triangle situated at
+*	the left of "C/C++". It opens a list, and you must choose the option "Language". Then you can choose your version in the "Norm of 
+*	language C++".
+*/
+	printSV(hello);		// Is better to use this function, because it doesn't copy the string
 	return 0; 
 } 
 // This function print a text. BAD PRACTICE, NEVER PASS AN STD::STRING IN A FUNCTION BY VALUE !!!
@@ -511,4 +527,10 @@ std::string case2()
 std::string case4()
 {
 	return already_here;
+}
+
+// This function is preffered, since we use std::string_view to pass the string by value
+void printSV(std::string_view s)
+{
+	std::cout << s << '\n';
 }
