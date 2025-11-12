@@ -464,13 +464,25 @@ int main()
 	case3();			// Okay, for the same reason
 	case4();			// BAD: the returned string already exists => it's the string "already_here". So we have a copy of this string
 
-/*	
+/*	Until now we used a std::string with a double-quoted string literals, which is a C-style string literal (e.g. "Hello"). But we can
+*	also create string literals of type std::string by using a suffix "s", placed after the double-quoted string literal. The s must 
+*	be lower case:
 */
-	return 0; 
-}
+	using namespace std::string_literals;	// it's an esay acces to the suffix s
+	std::cout << "Hello!"s << '\n';			// here is an std::string literal
+	std::cout << "Bye" << '\n';				// And here we have a C-style string
+/*	You probably won't use it, but it can be useful in some situations (we'll see it later).
+* 
+*	Also it's possible to create constexpr std::string strings, but they are badly supported in the latests C++ versions, so use 
+*	std::string_view instead.
+* 
+* 
+*/
 
+	return 0; 
+} 
 // This function print a text. BAD PRACTICE, NEVER PASS AN STD::STRING IN A FUNCTION BY VALUE !!!
-void print_text(std::string s)
+void print_text(std::string s) 
 {
 	std::cout << s << '\n';
 }
