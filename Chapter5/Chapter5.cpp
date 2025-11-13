@@ -494,7 +494,56 @@ int main()
 *	the left of "C/C++". It opens a list, and you must choose the option "Language". Then you can choose your version in the "Norm of 
 *	language C++".
 */
-	printSV(hello);		// Is better to use this function, because it doesn't copy the string
+	printSV(hello);								// Is better to use this function, because it doesn't copy the string
+	std::string_view forSV{ "Hello again" };	// This time, we don't even copy the string into the variable "forSV" !
+	printSV(forSV);
+	
+/*	So the function printSV is far more better that the function print_text, because we don't create a copy of the string in the 
+*	function. Also, we can use the std::string_view during initialization, which avoid us to copy string at this point too.
+*	So the best practive is to use std::string_view when we need a read-only string (so if you don't need to modify it), especially
+*	for function parameters.
+*	
+*	Another neat thing (soigné) about std::string_view is how flexible it is: you can initialize it using a C-style string, an
+*	std::string variable or even another std::string_view variable!
+*/
+	std::string_view s1{ "C-style string" };
+
+	std::string s2{ "std::string" };
+	std::string_view s3{ s2 };
+	
+	std::string_view s4{ s3 };
+
+	std::cout << s1 << '\n' << s3 << '\n' << s4 << '\n';
+
+/*	Also, it is useful to know that when you pass a C-style string or a std::string object by value in a function, it implicitly 
+*	convert them to a std::string_view. Therefore, a std::string_view parameter will accept  arguments of type C-style string, 
+*	std::string and std::string_view
+*/
+	printSV("C-style string converted to std::string_view");
+	printSV(s1);
+	printSV(s3);
+
+/*	however, C++ doesn't allow an implicit conversion of std::string_view to a std::string. This is to prevent making an expansive
+*	copy by accident, when you pass your std::strin_view argument to a std::string paramater.
+*	To by pass this problem, you can initalize a std::string using your std::strin_view, and then pass it by value, or you can
+*	convert it to a std::string type, using static_cast.
+*/
+	//print_text(s3);							// will occur an error, since the conversion is disallowed
+	print_text(static_cast<std::string>(s3));	// but we can do that
+
+/*	ONE IMPORTANT THING: when we assign a new string to std::string_view, it doest's change the prior std::string that had been viewed.
+*	Consider the following example:
+*/
+	std::string my_house{"It is very big"};
+	std::string_view another_house{ my_house };
+	std::cout << another_house << '\n';
+
+	another_house = "Now it's smal";
+	std::cout << another_house << '\t' << my_house << '\n';		// the std::string_view has changed, but not the std::string
+
+/*
+*/
+
 	return 0; 
 } 
 // This function print a text. BAD PRACTICE, NEVER PASS AN STD::STRING IN A FUNCTION BY VALUE !!!
