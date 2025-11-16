@@ -559,6 +559,21 @@ int main()
 	std::cout << con_str << '\n';		// con_str will be replaced at compile-time
 
 
+/*************************************** 5.9 - Introduction to std::string_view (part 2) *********************************************
+*	It's our first time when we encounter a view type with std::string_view. So this chapter will explaine what does this type do, and
+*	when we should use std::string or std::string_view.
+* 
+*	So imagine you want to draw a picture of a bike. The first option is to buy a new bike in a market, and that has many advantages:
+*	you can decorate your bike, you can move it and you can always guarantee that your bike will be always avaible. But there are also
+*	some downsides to this choice: you must periodically maintain it, when you don't want it any more you have to properly dispose of
+*	it (s'en débarasser correctement), and the most imporant: it's expensive of buying a new bike!
+*	The other option is to look at the bike of you neighboor, that you can see from your window. The benefits are that you can draw
+*	pictures of this bike, but without being responsible of it, or maintain it periodically. You can also simply close your curtains
+*	(rideaux) and move it from your life. But there is also some potential downsides: while you'll be viewing the neighboor's bike, he
+*	can change it or move it of your view altogether (tout à fait). So you may end with a view of something unexpected.
+* 
+*	
+*/
 
 	return 0; 
 } 
