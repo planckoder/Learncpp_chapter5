@@ -478,7 +478,7 @@ int main()
 *	Also it's possible to create constexpr std::string strings, but they are badly supported in the latests C++ versions, so use 
 *	std::string_view instead.
 * 
-**************************************** 5.8 - Introduction to std::string ***********************************************************
+**************************************** 5.8 - Introduction to std::string_view ******************************************************
 *	Consider the following examples:
 */
 	int alpha{ 8 };			// the value 8 is copied into the memory allocated for variable alpha. For fundamental types it's fast
@@ -541,8 +541,24 @@ int main()
 	another_house = "Now it's smal";
 	std::cout << another_house << '\t' << my_house << '\n';		// the std::string_view has changed, but not the std::string
 
-/*
+/*	Also it's possible to create string literals of type "std::string_view". To do that, write first the access to the to the literals
+*	: "using namespace std::string_view_literals", and then put the suffix "sv" after you C-style strings (which are double-quoted).
 */
+	using namespace std::string_literals;			// this is the access to the std::string literals
+	using namespace std::string_view_literals;		// and this for std::strin_view
+
+	std::cout << "C-style string" << '\n';
+	std::cout << "std::sting"s << '\n';
+	std::cout << "std::string_view"sv << '\n';
+
+/*	And unlike std::string, constexpr std::strin_view has full support. So when we need a string symbolic constant that will be 
+*	replaced at compile-time, the preffered choice is constexpr std::string_view.
+*/
+	constexpr std::string_view con_str{ "I'm constant" };
+
+	std::cout << con_str << '\n';		// con_str will be replaced at compile-time
+
+
 
 	return 0; 
 } 
