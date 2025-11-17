@@ -572,7 +572,41 @@ int main()
 *	(rideaux) and move it from your life. But there is also some potential downsides: while you'll be viewing the neighboor's bike, he
 *	can change it or move it of your view altogether (tout à fait). So you may end with a view of something unexpected.
 * 
-*	
+*	So according to this example, std::string is the first case. When we initialize a std::string using an initializer (a C-style 
+*	string for example), it makes an expensive copy of it. It has some benefits:
+*		- The memory is reserved to the objet and guaranteed to exist for as long the object does.
+*		- The initialized object has it own independent value to acces and manipulate later.
+*		- The nex object is no longer reliant on the initializer in any way. And it's great, because can't be generally trusted after
+*		  the initialization. For example if we return a value from a function to the caller, if it was a temporary object will be  
+*		  directly destroyed, and if it was a variable, the caller can do whatever it wants, including modify or destroy it.
+*	The downsides of making a std::string are the following:
+*		- We must make an expansive copy!
+*		- We must manage the acces to the string data
+*		- We must properly disposing of string data when the std::string object	is destroyed.
+* 
+*	Now let's see an example of the previous lesson, to understand when we can use a copy of a string:
+*/
+	std::string s5{ "Should the function make a copy ?" };
+
+	print_text(s5);
+
+/*	So here we used the parameter of type std::string instead of std::string_view. But to know if we can use std::string, ask 
+*	yourself these 3 questions:
+*		- Could s5 be destroyed while s is still using it? (Here no)
+*		- Could s5 be modified while s is still using it? (Here no)
+*		- Could s modify the string in some way the caller would not expect? (Here no)
+*	If the answer to these three questions is no, then use std::string_view!
+* 
+*	Now let's talk about std::string_view. It creates an unexpensive view of the initialization string, and then it can be used
+*	whenever (chaque fois) access to the string is required. So here are the benefits:
+*		- It is unexpensive
+*		- it cannot modify the object its viewing
+*		- Having multiple viewers for a single object is fine
+*		- When the view is destroyed, the object is not affected
+*	BUT, there are some thing you must ensure:
+*		- The string being viewed CANNOT be modified or destroyed while the view is still being viewed. It can lead to unexpected 
+*		  or undefined behaviour.
+*		
 */
 
 	return 0; 
