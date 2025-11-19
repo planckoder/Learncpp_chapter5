@@ -579,5 +579,56 @@ int main()
 	std::cout << s6 << '\n';	// we have an undefined behaviour (in my case the program prints white lines), because the object (s7)
 								// that the s6 was viewing has been destroyed at the end of the nested block.
 
+/*	Another variant of this issue is when we initialize a std::string_view using a std::string variable returned from a function. The
+*	problem is that return values are temporary objects, so when we want to print the std::string_view, the value to which it was 
+*	pointing is already destroyed. To by pass this problem, you can copy it to use it later (with std::string), or simply directly 
+*	use this value.
+*/
+	std::string_view s8{ case1() };		
+	std::cout << s8 << '\n';			// At this point, the viewed object is already destroyed. We have an undefined behaviour
+
+/*	And the last non-obvious example is when we initialize a std::string_view using a std::string literal s. So when we add the suffix
+*	"s" to a C-style string, we get a temporary std::string, that will be then destroyed. The std::string_view is left dangling 
+*	(suspendu), and we get an undefined behaviour.
+*/
+	using namespace std::string_literals;
+	std::string_view s9{ "std::string"s };
+	std::cout << s9 << '\n';				// the std::string litteral is destroyed, leaving the std::string_view object dangling
+
+/*	In fact, std::string litteral (s) is the single string that is temporary. But you can whithout fear initialize with:
+*		- A C-style litteral
+*		- A std::string_view litteral (sv)
+*		- A C-style object								, as long as it outlives the view
+*		- A std::string object (std::string)			, as long as it outlives the view
+*		- A std::string_view object (std::string_view)	, as long as it outlives the view
+* 
+*	Also, don't forget that if you change the string at which the std::string_view is viewing, it leads to an undefined behaviour.
+*/
+	std::string s10{ "Oh, macarena!" };
+	std::string_view s11{ s10 };
+
+	s10 = "macarena, macarena!";
+	std::cout << s11 << '\n';			// and again an undefined behaviour! s11 was viewing s10, but we changed it.
+
+/*	So remember: changing a std::string is likely to invalidate all views into that std::string
+* 
+*	Now, let's see how to reinvalide invalide std::string_view's (like in the examples just above). The solution is simple: you just
+*	have to assign the invalidated std::string_view object a valid string to view. Look how to do so:
+*/
+	std::string s12{ "Matushka zemlya!" };
+	std::string_view s13{ s12 };
+
+	s12 = "Belaya beriezynka!";		// At this point s13 is invalid since s12 has been destroyed. s13 is dangling.
+
+	std::cout << s13 << '\n';		// Undefined behaviour
+
+	s13 = s12;						// But now we're reinvalidating s13. Now it's viewing again the string s12.
+
+	std::cout << s13 << '\n';		
+
+/*	
+*/
+
+
 	return 0; 
 } 
