@@ -76,3 +76,31 @@ void printSV(std::string_view s)
 	std::cout << s << '\n';
 }
 
+// BAD PRACTICE: never use a std::string_view as the return value of a function, if you return a local std::string.
+std::string_view get_bool_name(bool b)
+{
+	std::string t{ "true" };
+	std::string f{ "false" };
+	if (b == true)
+		return t;
+	else
+		return f;
+}					// at this point strings t and f are destroyed, and we get an undefined behaviour.
+
+// YOU CAN: using a std::string_view as the return value of a function, if you return a C-style string (it is not destroyed)
+std::string_view get_bool_name2(bool b)
+{
+	if (b==true)
+		return "true";
+	else
+		return "false";
+}							// the C-style strings are not destroyed at the end of the function
+
+// YOU CAN: using a std::string_view as a return value, if you return a std::string_view parameter
+std::string_view first_alphabet(std::string_view a, std::string_view b)
+{
+	if (a>b)
+		return b;
+	else
+		return a;
+}

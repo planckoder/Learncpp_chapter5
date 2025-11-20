@@ -27,4 +27,14 @@ std::string case4();
 
 void printSV(std::string_view s);
 
+// BAD PRACTICE: never use a std::string_view as the return value of a function, if you return a local std::string.
+std::string_view get_bool_name(bool b);
+
+// YOU CAN: using a std::string_view as the return value of a function, if you return a C-style string (it is not destroyed)
+std::string_view get_bool_name2(bool b);
+
+// YOU CAN: using a std::string_view as a return value, if you return a std::string_view parameter
+std::string_view first_alphabet(std::string_view a, std::string_view b);
+
+
 #endif

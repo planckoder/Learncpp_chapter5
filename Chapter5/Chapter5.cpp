@@ -626,9 +626,27 @@ int main()
 
 	std::cout << s13 << '\n';		
 
-/*	
+/*	In function, be careful when you return a std::string_view. 
+*	NEVER return a std::string_view if it's viewing a local std::string, because when you return the std::string_view, the string it 
+*	was viewing is already destroyed, and you get an undefined behaviour.
+*	BUT YOU CAN return a std::string_view from a function it this two cases:
+*		- If you retrurn a local C-style string. C-style strings exist all along the program, so there is no risk of them being 
+*		  destroyed.
+*		- If you return a function parameter of type std::string_view, which in turn (à son tour) is viewing a string out of the 
+*		  function. This is because when the function returns a parameter, it returns the view of the string out of the scope instead.
+*	However, if the function parameter is a temporary object, you must use your returned value immediatly, as it will be left dangling
+*	after the temporary is destroyed.
 */
+	std::cout << get_bool_name(true) << '\t' << get_bool_name(false) << '\n';	// The BAD PRACTICE => undefined behaviour
 
+	std::cout << get_bool_name2(true) << '\t' << get_bool_name2(false) << '\n';	// NO PROBLEM: we return C-style strings	
 
+	std::string alpha1{ "mama" };
+	std::string alpha2{ "papa and mama" };
+	std::cout << first_alphabet(alpha1, alpha2) << '\n';	// NO PROBLEM: the return value is viewing alpha1 or alpha2
+
+	std::string first_letter{ first_alphabet("haha"s, "hoho"s)};	// WARNING: we can get a undefined behaviour
+	std::cout << first_letter << '\n';
+ 
 	return 0; 
 } 
