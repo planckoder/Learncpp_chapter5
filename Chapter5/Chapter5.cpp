@@ -645,8 +645,80 @@ int main()
 	std::string alpha2{ "papa and mama" };
 	std::cout << first_alphabet(alpha1, alpha2) << '\n';	// NO PROBLEM: the return value is viewing alpha1 or alpha2
 
-	std::string first_letter{ first_alphabet("haha"s, "hoho"s)};	// WARNING: we can get a undefined behaviour
-	std::cout << first_letter << '\n';
+	std::string_view first_letter{ first_alphabet("haha"s, "hoho"s)};	// WARNING: we can get a undefined behaviour
+	std::cout << first_letter << '\n';			// We print aha instead of haha, because the temporary strings have been destroyed
+
+/*	Imagine you have a window. You can look at an object trought it, and you can modify your view by hiding the right or the left of
+*	the object with curtains. It's the same for std::string_view.
+*	If you want to remove some characters from the left side of the view, use: variable.remove_prefix(amount);
+*	If you want to remove some characters from the right side of the view, use: variable.remove_suffix(amount);
+*	Note that you don't change the string that is viewed, you only change its view.
+*	Also, from the moment you used these function "curtains", the only way to reset the view is reassigning the source string to it
+*	again.
+*/
+	std::string_view s14{ "Moskow" };
+	std::cout << s14 << '\n';
+
+	s14.remove_prefix(2);			// We remove 2 characters from the left side
+	std::cout << s14 << '\n';
+
+	s14.remove_suffix(1);			// We remove 1 character from the right side	
+	std::cout << s14 << '\n';
+
+	s14 = "Moskow";					// We reset the view
+	std::cout << s14 << '\n';
+
+/*	So these "curtains" bring up (met en lumière) an important use of std::string_view. We can not only copy an entire string without
+*	making a copy, but also copy a substring without making a copy. A substring is a sequence of juxtaposed characters within an 
+*	existing string. (e.g. "snowball" has inside the substrings "now" or "wbal", but "swa" is not a substring)
+* 
+*	And also, since we can use substrings, the std::string_view may or may not be null-terminated ('\0' at the end of the string). 
+*	However, C-style strings and std::string object are also null terminated. So if you want to be sure your std::string_view is
+*	null-terminated, convert it into a std::string.
+*	But hopefully, it doesn't matter if your string is null terminated or not, since std::string_view keeps track of the length.
+*	Just take care not to write any code that assumes std::string_view is null-terminated.
+* 
+*	So know, after all the theory, let's make a brief guide when to use std::string, and when std::string_view
+*	VARIABLES
+*	1) std::string:
+*		- you need a string that you can modify
+*		- to store user-inputted text 
+*		- to store a value of a function that returns a std::string
+*	2) std::string_view:
+*		- you need a read-only access of the string that already exist, and that won't be modified or destroyed
+*		- if you want a symbolic constant of a C-style string (constexpr std::string_view)
+*		- you need to continue viewing the return value of a function that returns a C-style string or a non-dangling std::sttring_view
+*	
+*	FUNCTION PARAMETERS(INSIDE THE PARATHESIS)
+*	1) std::string:
+*		- the function needs to modify the string passed in as an argument without affecting tha caller. This is rare.
+*		- you want to code on C++ 14 or older
+*	2) std::string_view:
+*		- the function needs a read-only string
+*		- the function needs to work with non null-terminated strings
+* 
+*	RETURN TYPES
+*	1) std::string:
+*		- the return value is a std::string local variable or function parameter
+*	2) std::string_view:
+*		- you return a C-style string, or a local std::string_view that has been initialized with a C-style string
+*		- the function returns a std::string_view parameter
+* 
+*	THINGS TO REMEMBER ABOUT STD::STRING
+*		- Initializing and copying is expensive => avoid as much as possible
+*		- Avoid passing by value to a function (copy)
+*		- Avoid creating short-lived std::string
+*		- Modifying std::string invalidates all the views
+*		- OK to return a local std::string with it
+* 
+*	THINGS TO REMEMBER ABOUT STD::STRING_VIEW
+*		- typically used for passing string function parameters and returning string literals
+*		- always ok to set a std::string_view to a C-style string literal (C-style strings exist along all the program)
+*		- when a string is destroyed, all views to that strings are invalidated
+*		- using an invalidated string will cause an undefined behaviour
+*		- std::string may or may not be null-terminated
+*/
+
  
 	return 0; 
 } 
